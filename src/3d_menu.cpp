@@ -2160,8 +2160,7 @@ void CP_Cheats(
             break;
 
         case CH_GOD_MODE:
-            //TODO
-            //gamestate.flags ^= GS_DRAW_CEILING;
+            ::godmode = !::godmode;
             ShootSnd();
             DrawCheatMenu();
             break;
@@ -2233,8 +2232,7 @@ void DrawAllCheatLights(
                 break;
 
             case CH_GOD_MODE:
-                //TODO
-                if (gamestate.flags & GS_DRAW_FLOOR) {
+                if (::godmode) {
                     Shape++;
                 }
                 break;
