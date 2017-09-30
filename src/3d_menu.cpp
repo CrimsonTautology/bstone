@@ -2139,22 +2139,19 @@ void CP_Cheats(
 
         switch (which) {
         case CH_ACTORS_MAP:
-            //TODO
-            //gamestate.flags ^= GS_LIGHTING;
+            ::ExtraRadarFlags ^= OV_ACTORS;
             ShootSnd();
             DrawCheatMenu();
             break;
 
         case CH_SHOW_PUSH_WALLS:
-            //TODO
-            //gamestate.flags ^= GS_DRAW_FLOOR;
+            ::ExtraRadarFlags ^= OV_PUSHWALLS;
             ShootSnd();
             DrawCheatMenu();
             break;
 
         case CH_INVISIBILITY:
-            //TODO
-            //gamestate.flags ^= GS_ATTACK_INFOAREA;
+            ::PlayerInvisable = !::PlayerInvisable;
             ShootSnd();
             DrawCheatMenu();
             break;
@@ -2211,22 +2208,19 @@ void DrawAllCheatLights(
 
             switch (i) {
             case CH_ACTORS_MAP:
-                //TODO
-                if (gamestate.flags & GS_LIGHTING) {
+                if (::ExtraRadarFlags & OV_ACTORS) {
                     Shape++;
                 }
                 break;
 
             case CH_SHOW_PUSH_WALLS:
-                //TODO
-                if (gamestate.flags & GS_ATTACK_INFOAREA) {
+                if (::ExtraRadarFlags & OV_PUSHWALLS) {
                     Shape++;
                 }
                 break;
 
             case CH_INVISIBILITY:
-                //TODO
-                if (gamestate.flags & GS_DRAW_CEILING) {
+                if (::PlayerInvisable) {
                     Shape++;
                 }
                 break;
