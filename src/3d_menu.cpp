@@ -130,6 +130,17 @@ void DrawAllSwitchLights(
 void DrawSwitchDescription(
     int16_t which);
 
+void CP_Cheats(
+    int16_t temp1);
+
+void DrawCheatMenu();
+
+void DrawAllCheatLights(
+    int16_t which);
+
+void DrawCheatDescription(
+    int16_t which);
+
 // BBi
 void cp_sound_volume(
     int16_t);
@@ -149,7 +160,7 @@ extern bool refresh_screen;
 // ===========================================================================
 
 CP_iteminfo MainItems = { MENU_X, MENU_Y, 12, MM_READ_THIS, 0, 9, { 77, 1, 154, 9, 1 } };
-CP_iteminfo GopItems = { MENU_X, MENU_Y + 30, 5, 0, 0, 9, { 77, 1, 154, 9, 1 } };
+CP_iteminfo GopItems = { MENU_X, MENU_Y + 30, 6, 0, 0, 9, { 77, 1, 154, 9, 1 } };
 CP_iteminfo SndItems = { SM_X, SM_Y, 6, 0, 0, 7, { 87, -1, 144, 7, 1 } };
 CP_iteminfo LSItems = { LSM_X, LSM_Y, 10, 0, 0, 8, { 86, -1, 144, 8, 1 } };
 CP_iteminfo CtlItems = { CTL_X, CTL_Y, 7, -1, 0, 9, { 87, 1, 174, 9, 1 } };
@@ -157,6 +168,7 @@ CP_iteminfo CusItems = { CST_X, CST_Y + 7, 6, -1, 0, 15, { 54, -1, 203, 7, 1 } }
 CP_iteminfo NewEitems = { NE_X, NE_Y, 6, 0, 0, 16, { 43, -2, 119, 16, 1 } };
 CP_iteminfo NewItems = { NM_X, NM_Y, 4, 1, 0, 16, { 60, -2, 105, 16, 1 } };
 CP_iteminfo SwitchItems = { MENU_X, 0, 0, 0, 0, 9, { 87, -1, 132, 7, 1 } };
+CP_iteminfo CheatItems = { MENU_X, MENU_Y + 30, 4, 0, 0, 9, { 87, -1, 132, 7, 1 } };
 
 // BBi
 CP_iteminfo video_items = { MENU_X, MENU_Y + 30, 1, 0, 0, 9, { 77, -1, 154, 7, 1 } };
@@ -190,7 +202,8 @@ CP_itemtype GopMenu[] = {
     // BBi
 
     { AT_ENABLED, "CONTROLS", CP_Control },
-    { AT_ENABLED, "SWITCHES", CP_Switches }
+    { AT_ENABLED, "SWITCHES", CP_Switches },
+    { AT_ENABLED, "CHEATS", CP_Cheats }
 };
 
 CP_itemtype SndMenu[] = {
@@ -224,6 +237,13 @@ CP_itemtype SwitchMenu[] = {
     { AT_ENABLED, "ALWAYS RUN", 0 },
     { AT_ENABLED, "HEART BEAT SOUND", 0 },
     { AT_ENABLED, "ROTATED AUTOMAP", 0 },
+};
+
+CP_itemtype CheatMenu[] = {
+    { AT_ENABLED, "SHOW ACTORS ON AUTOMAP", 0 },
+    { AT_ENABLED, "SHOW PUSH WALLS ON AUTOMAP", 0 },
+    { AT_ENABLED, "PLAYER INVISIBILITY", 0 },
+    { AT_ENABLED, "GOD MODE", 0 },
 };
 
 
@@ -2083,6 +2103,158 @@ void DrawSwitchDescription(
         "TOGGLES ALWAYS RUN MODE",
         "TOGGLES HEART BEAT SOUND WITH EKG",
         "TOGGLES <TAB>/<SHIFT+TAB> FUNCTIONS",
+    };
+
+    fontnumber = 2;
+
+    WindowX = 48;
+    WindowY = (::is_ps() ? 134 : 144);
+    WindowW = 236;
+    WindowH = 8;
+
+    VWB_Bar(WindowX, WindowY - 1, WindowW, WindowH, ::menu_background_color);
+
+    SETFONTCOLOR(TERM_SHADOW_COLOR, TERM_BACK_COLOR);
+    US_PrintCentered(instr[which]);
+
+    WindowX--;
+    WindowY--;
+
+    SETFONTCOLOR(INSTRUCTIONS_TEXT_COLOR, TERM_BACK_COLOR);
+    US_PrintCentered(instr[which]);
+}
+
+void CP_Cheats(
+    int16_t)
+{
+    int16_t which;
+
+    CA_CacheScreen(BACKGROUND_SCREENPIC);
+    DrawCheatMenu();
+    MenuFadeIn();
+    WaitKeyUp();
+
+    do {
+        which = HandleMenu(&CheatItems, CheatMenu, DrawAllCheatLights);
+
+        switch (which) {
+        case CH_ACTORS_MAP:
+            //TODO
+            //gamestate.flags ^= GS_LIGHTING;
+            ShootSnd();
+            DrawCheatMenu();
+            break;
+
+        case CH_SHOW_PUSH_WALLS:
+            //TODO
+            //gamestate.flags ^= GS_DRAW_FLOOR;
+            ShootSnd();
+            DrawCheatMenu();
+            break;
+
+        case CH_INVISIBILITY:
+            //TODO
+            //gamestate.flags ^= GS_ATTACK_INFOAREA;
+            ShootSnd();
+            DrawCheatMenu();
+            break;
+
+        case CH_GOD_MODE:
+            //TODO
+            //gamestate.flags ^= GS_DRAW_CEILING;
+            ShootSnd();
+            DrawCheatMenu();
+            break;
+
+        default:
+            break;
+        }
+    } while (which >= 0);
+
+    ::MenuFadeOut();
+}
+
+void DrawCheatMenu()
+{
+    CA_CacheScreen(BACKGROUND_SCREENPIC);
+
+    ClearMScreen();
+    DrawMenuTitle("GAME CHEATS");
+    DrawInstructions(IT_STANDARD);
+
+    fontnumber = 2;
+
+    DrawMenu(&CheatItems, &CheatMenu[0]);
+    DrawAllCheatLights(CheatItems.curpos);
+
+    VW_UpdateScreen();
+}
+
+void DrawAllCheatLights(
+    int16_t which)
+{
+    int16_t i;
+    uint16_t Shape;
+
+    for (i = 0; i < CheatItems.amount; i++) {
+        if (CheatMenu[i].string[0]) {
+            Shape = C_NOTSELECTEDPIC;
+
+            //
+            // DRAW SELECTED/NOT SELECTED GRAPHIC BUTTONS
+            //
+
+            if (CheatItems.cursor.on) {
+                if (i == which) { // Is the cursor sitting on this pic?
+                    Shape += 2;
+                }
+            }
+
+            switch (i) {
+            case CH_ACTORS_MAP:
+                //TODO
+                if (gamestate.flags & GS_LIGHTING) {
+                    Shape++;
+                }
+                break;
+
+            case CH_SHOW_PUSH_WALLS:
+                //TODO
+                if (gamestate.flags & GS_ATTACK_INFOAREA) {
+                    Shape++;
+                }
+                break;
+
+            case CH_INVISIBILITY:
+                //TODO
+                if (gamestate.flags & GS_DRAW_CEILING) {
+                    Shape++;
+                }
+                break;
+
+            case CH_GOD_MODE:
+                //TODO
+                if (gamestate.flags & GS_DRAW_FLOOR) {
+                    Shape++;
+                }
+                break;
+            }
+
+            VWB_DrawPic(CheatItems.x - 16, CheatItems.y + i * CheatItems.y_spacing - 1, Shape);
+        }
+    }
+
+    DrawCheatDescription(which);
+}
+
+void DrawCheatDescription(
+    int16_t which)
+{
+    const char* instr[] = {
+        "TOGGLES ACTORS ON AUTOMAP",
+        "TOGGLES SECRET PUSH WALLS ON AUTOMAP",
+        "TOGGLES PLAYER'S INVISIBILITY",
+        "TOGGLES GOD MODE",
     };
 
     fontnumber = 2;

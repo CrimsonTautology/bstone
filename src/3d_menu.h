@@ -148,6 +148,14 @@ enum sw_labels {
     SW_ROTATED_AUTOMAP,
 }; // sw_labels
 
+// CP_Cheat() menu labels
+enum ch_labels {
+    CH_ACTORS_MAP,
+    CH_SHOW_PUSH_WALLS,
+    CH_INVISIBILITY,
+    CH_GOD_MODE,
+}; // ch_labels
+
 // BBi
 enum MenuVideoLables {
     mvl_stretch_to_window,
